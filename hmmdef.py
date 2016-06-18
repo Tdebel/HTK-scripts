@@ -24,6 +24,7 @@ def write_hmms(outfile, *hmms):
     with open(outfile,'w') as f:
         wrln = lambda s: f.write(s+'\n')
         for hmm in hmms:
+            wrln('~h "{}"'.format(hmm.name))
             wrln('<BeginHMM>')
             wrln('\t<VecSize> {}'.format(len(hmm.states[0])))
             wrln('\t<{}>'.format(hmm.kind))
