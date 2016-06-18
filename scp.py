@@ -21,3 +21,4 @@ if __name__ == '__main__':
     parser.add_argument('outfile', help='The path to the output file.')
     args = parser.parse_args()
     make_scp(args.indir, args.outdir, args.outfile)
+
