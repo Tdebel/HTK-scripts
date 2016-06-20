@@ -1,0 +1,58 @@
+WARNING: no script file ordered_dict.txt.ded
+
+Dictionary Usage Statistics
+---------------------------
+  Dictionary    TotalWords WordsUsed  TotalProns PronsUsed
+ordered_dict      2760       2751       2761       2752
+        dict      2751       2751       2752       2752
+
+2751 words required, 0 missing
+
+New Phone Usage Counts
+---------------------
+  1. {     :   377
+  2. l     :   667
+  3. _     :   163
+  4. nh    :   154
+  5. r     :   709
+  6. n     :   759
+  7. z     :   515
+  8. sp    :  2752
+  9. @     :   740
+ 10. m     :   458
+ 11. E     :   337
+ 12. I     :  1343
+ 13. k     :   707
+ 14. b     :   376
+ 15. h     :   152
+ 16. nb    :   304
+ 17. p     :   465
+ 18. S     :   159
+ 19. $     :   165
+ 20. R     :   194
+ 21. v     :   176
+ 22. ng    :   154
+ 23. U     :   156
+ 24. d     :   970
+ 25. nd    :   152
+ 26. i     :   220
+ 27. s     :   931
+ 28. t     :  1080
+ 29. j     :   167
+ 30. T     :   151
+ 31. J     :   158
+ 32. Q     :   196
+ 33. V     :   254
+ 34. nf    :   218
+ 35. f     :   301
+ 36. u     :   182
+ 37. g     :   178
+ 38. #     :   162
+ 39. H     :   144
+ 40. w     :   176
+ 41. P     :   171
+ 42. N     :   200
+ 43. D     :   109
+ 44. nc    :   235
+
+Dictionary dict created
