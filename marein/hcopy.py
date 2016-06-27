@@ -33,8 +33,8 @@ def hcopy(indir,outdir,args):
     if not os.path.exists(outdir):
         os.mkdir(outdir)
     subprocess.call(['HCopy','-C',config_file,'-S',scp_file])
-    os.remove(scp_file)
-    os.remove(config_file)
+    # os.remove(scp_file)
+    # os.remove(config_file)
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Given input and output directories, convert the input to .mfc files based on the arguments.')
