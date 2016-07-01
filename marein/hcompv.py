@@ -2,20 +2,8 @@ import os
 import argparse
 import subprocess
 
-# write a hcopy config file to filename based on args (same as in hcopy.py, should be outsourced)
-def make_config(args,filename):
-    with open(filename,'w') as f:
-        t = most_common_type(args.indir)
-        if t.lower() not in SUPPORTED_TYPES:
-            raise ValueError('Filetype {} is not supported by HTK.'.format(t))
-        f.write('SOURCEFORMAT = {}\n'.format(t.upper()))
-        f.write('TARGETKIND = {}\n'.format(args.targetkind))
-        f.write('TARGETRATE = {}\n'.format(args.targetrate))
-        f.write('SAVECOMPRESSED = {}\n'.format(args.compressed))
-
 def hcompv(args):
-    config_file = 'hcompv_temp.config'
-    make_config(args,config_file)
+    config_file = 'hcopy_temp.config'
     subprocess.call('HCompV', '-C', config_file, '-f', args.floor, '-m', '-S', args.script, '-H', args.outdir, args.proto)
     os.remove(config_file)
 
