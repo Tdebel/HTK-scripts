@@ -8,7 +8,7 @@ def extract(filename,regex):
 def folder(out,path,regex):
     words = {extract(f,regex) for f in os.listdir(path)}
     with open(out,'w') as f:
-        f.write('$word = {}\n'.format(' | '.join(words)))
+        f.write('$word = {}\n'.format(' | '.join(words)) + ';')
         f.write('( [silence] $word [silence] )\n')
 
 if __name__ == '__main__':
