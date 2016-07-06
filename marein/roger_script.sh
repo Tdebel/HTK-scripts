@@ -11,3 +11,4 @@ python hcopy.py $INFILES mfc
 python proto.py proto
 cat hcopy_temp.scp | cut -d " " -f 2 > hcompv_temp.scp
 python hcompv.py proto hcompv_temp.scp hmmdef0
+python hled.py phones.mlf ordered_dict mlf
