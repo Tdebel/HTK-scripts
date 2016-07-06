@@ -1,0 +1,135 @@
+import sys
+import os
+import subprocess
+from grammer import *
+from prompt2mlf import *
+from sort_test_training import *
+from create_scp import *
+from create_proto import *
+from create_mfc_scp import *
+from sort_k_training import *
+from fix_dict import *
+
+class DataPreparer:
+  
+  def __init__(self):
+    self.local_folder = os.path.dirname(os.path.abspath(__file__))
+    self.current_path = self.local_folder
+    self.wavfilefolder = "segmentations"
+    self.gram = "gram"
+    self.wdnet = "wdnet"
+    self.wlist = "wlist"
+    self.dic = "dict"
+    self.worddict = "worddict"
+    self.phonesmlf = "phones0.mlf"
+    self.wordsmlf = "words.mlf"
+    self.config = "config"
+    self.codetrscp = "codetr.scp"
+    self.trainscp = "train.scp"
+    self.proto = "proto"
+    
+  def hparse(self):
+    params = "HParse %s %s"%(self.gram,self.wdnet)
+    subprocess.call(params,shell=True)
+    
+  def hdman(self):
+    params = "HDMan -m -w %s -n monophones1 -l dlog %s %s"%(self.wlist,self.dic,self.worddict)
+    subprocess.call(params,shell=True)
+    
+  def hled(self):
+    params = "HLEd -l '*' -d %s -i %s mkphones0.led %s"%(self.dic,self.phonesmlf,self.wordsmlf)
+    subprocess.call(params,shell=True)
+    
+  def hcopy(self):
+    params = "HCopy -T 1 -C %s -S %s"%(self.config,self.codetrscp)
+    subprocess.call(params,shell=True)
+    
+  def hcompv(self):
+    params = "HCompV -C %s -f 0.01 -m -S %s -M hmm0 %s"%(self.config,self.trainscp,self.proto)
+    subprocess.call(params,shell=True)
+    
+  def create_globalded(self):
+    with open("global.ded","w") as f1:
+      f1.write("AS sp\nRS cmu\nMP sil sil sp\n")
+      
+  def create_mkphones0led(self):
+    with open("mkphones0.led","w") as f2:
+      f2.write("EX\nIS sil sil\nDE sp\n")
+      
+  def create_config(self,flag):
+    if flag == "dataprep":
+      with open("config","w") as f3:
+	f3.write("SOURCEFORMAT = WAV\n")
+	f3.write("TARGETKIND = MFCC_0\n")
+	f3.write("TARGETRATE = 100000.0\n")
+	f3.write("SAVECOMPRESSED = T\n")
+	f3.write("SAVEWITHCRC = T\n")
+	f3.write("WINDOWSIZE = 250000.0\n")
+	f3.write("USEHAMMING = T\n")
+	f3.write("PREEMCOEF = 0.97\n")
+	f3.write("NUMCHANS = 26\n")
+	f3.write("CEPLIFTER = 22\n")
+	f3.write("NUMCEPS = 12\n")
+	f3.write("ENORMALISE = F\n")
+      self.config = "config"
+    elif flag == "monophone":
+      with open("config2","w") as f4:
+	f4.write("TARGETKIND = MFCC_0_D_A\n")
+	f4.write("TARGETRATE = 100000.0\n")
+	f4.write("SAVECOMPRESSED = T\n")
+	f4.write("SAVEWITHCRC = T\n")
+	f4.write("WINDOWSIZE = 250000.0\n")
+	f4.write("USEHAMMING = T\n")
+	f4.write("PREEMCOEF = 0.97\n")
+	f4.write("NUMCHANS = 26\n")
+	f4.write("CEPLIFTER = 22\n")
+	f4.write("NUMCEPS = 12\n")
+	f4.write("ENORMALISE = F\n")
+      self.config = "config2"
+    elif flag == "test":
+      with open("config3","w") as f5:
+	f5.write("SOURCEFORMAT = WAV\n")
+	f5.write("TARGETKIND = MFCC_0_D_A\n")
+	f5.write("TARGETRATE = 100000.0\n")
+	f5.write("SAVECOMPRESSED = T\n")
+	f5.write("SAVEWITHCRC = T\n")
+	f5.write("WINDOWSIZE = 250000.0\n")
+	f5.write("USEHAMMING = T\n")
+	f5.write("PREEMCOEF = 0.97\n")
+	f5.write("NUMCHANS = 26\n")
+	f5.write("CEPLIFTER = 22\n")
+	f5.write("NUMCEPS = 12\n")
+	f5.write("ENORMALISE = F\n")
+      
+  def execute(self):
+    gc = GrammerCreator()
+    gc.execute(self.wavfilefolder)
+    self.hparse()
+    self.create_globalded()
+    self.hdman()
+    #s = Sorter()
+    #s.execute(0.90,0.10)
+    s = Sorterk()
+    s.execute(0.30)
+    mf = Mlfifier()
+    mf.prompt2mlf("words.mlf","training")
+    self.create_mkphones0led()
+    self.hled()
+    self.create_config("dataprep")
+    sc = ScpCreator()
+    sc.execute()
+    self.hcopy()
+    pc = ProtoCreator()
+    pc.execute(39,"MFCC_0_D_A")
+    self.create_config("monophone")
+    msc = MfcScpCreator()
+    msc.execute()
+    self.hcompv()
+    self.create_config("test")
+    df = DictFixer()
+    df.fixdic()
+    
+dp = DataPreparer()
+dp.execute()
+    
+  

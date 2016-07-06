@@ -40,7 +40,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Given input and output directories, convert the input to .mfc files based on the arguments.')
     parser.add_argument('indir', help='The directory containing the input sound files.')
     parser.add_argument('outdir', help='The target directory for the converted files.')
-    parser.add_argument('-k', '--targetkind', nargs='?', default='MFCC_0_D', type=str)
+    parser.add_argument('-k', '--targetkind', nargs='?', default='MFCC_0_D_A', type=str)
     parser.add_argument('-r', '--targetrate', nargs='?', default=100000.0, type=float)
     parser.add_argument('-c', '--compressed', nargs='?', default='T', choices=['T','F'])
     args = parser.parse_args()

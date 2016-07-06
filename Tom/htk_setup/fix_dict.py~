@@ -1,0 +1,38 @@
+class DictFixer:
+  
+  def __init__(self):
+    self.fixedlines = []
+    self.worddict = {}
+    self.outputsym
+    self.length_longest_word = 0
+    
+  def fixdic(self):
+    dictfixed = open("dict_fixed","w")
+    with open("dict","r") as file:
+      for line in file:
+	content = line.split()
+	word = content[0]
+	phones = content[1:]
+	combined_phones = " ".join(phones)
+	worddict[word] = combined_phones
+	outputsym[word] = ""
+    worddict["silence"] = "sil"
+    outputsym["silence"] = ""
+    worddict["SENT-END"] = "sil"
+    outputsym["SENT-END"] = "[]"
+    worddict["SENT-START"] = "sil"
+    outputsym["SENT-START"] = "[]"
+    longest_word = ""
+    for key in worddict.keys():
+      if len(key) > length_longest_word:
+	length_longest_word = len(key)
+	longest_word = key
+	
+    for key,value in sorted(worddict.items()):
+      #n = (length_longest_word-len(key))
+      if 8 <= len(key) < 16:
+	dictfixed.write("%s\t%s\t%s\n"%(key,outputsym[key],value))
+      elif 0 < len(key) < 8:
+	dictfixed.write("%s\t\t%s\t%s\n"%(key,outputsym[key],value))
+    
+    dictfixed.close()
