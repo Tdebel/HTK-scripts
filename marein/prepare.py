@@ -1,7 +1,6 @@
 import os, re
-import argparse
-import functools
-import subprocess
+import argparse, functools, subprocess
+from shutil import copyfile
 from collections import Counter
 
 call = functools.partial(subprocess.call,shell=True)
@@ -41,14 +40,31 @@ def make_scp(indir, outdir, outfile):
     with open(outfile,'w') as outfile:
         for f in os.listdir(indir):
             outfile.write('{} {}\n'.format(inpath(f),outpath(f)))
-	
+
+# return the most common filetype in the given dir
+def most_common_type(dir):
+    files = os.listdir(dir)
+    types = [os.path.splitext(f)[1] for f in files]
+    counter = Counter(types)
+    return counter.most_common(1)[0][0][1:].upper()
+
+ def add_sourceformat_to_config(indir,config_in,config_out):
+    copyfile(config_in,config_out)
+    filetype = most_common_type(indir)
+    with open(config_out,'r+') as f:
+        content = f.read()
+        f.seek(0,0)
+        f.write('SOURCEFORMAT = {}\n'.format(filetype) + content)
+    
 # hcopy the files from indir to outdir given a config file
-def hcopy(indir,outdir,config_file):
-    scp_file = 'scp'
-    make_scp(indir,outdir,scp_file)
+def hcopy(indir,outdir,config):
+    scp = 'scp'
+    make_scp(indir,outdir,scp)
     if not os.path.exists(outdir):
         os.mkdir(outdir)
-    subprocess.call(['HCopy','-C',config_file,'-S',scp_file])
+    config_prepare = config+'_prepare'
+    add_sourceformat_to_config(indir,config,config_prepare)
+    subprocess.call(['HCopy','-C',config_prepare,'-S',scp])
 		
 def prepare(indir,outdir,regex,config,dict):
 	gram_folder('gram',indir,regex)
@@ -64,7 +80,7 @@ def prepare(indir,outdir,regex,config,dict):
 	call("sort dict -o dict")
 	mlf_folder('words.mlf',indir,regex)
 	hcopy(indir,outdir,config)
-	
+    
 # python prepare.py ../../material/segmentations mfc "cut_\d*_\d*_(\w*).wav" input/config input/current_wordlist.txt
 
 if __name__ == '__main__':
