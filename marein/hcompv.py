@@ -12,7 +12,7 @@ def make_config(args,filename):
 def hcompv(args):
     config_file = 'hcompv_temp.config'
     make_config(args,config_file)
-    subprocess.call(['HCompV', '-C', config_file, '-f', args.floor, '-m', '-S', args.script, '-H', args.proto, '-M', args.outdir])
+    subprocess.call(['HCompV', '-C', config_file, '-f', args.floor, '-m', '-S', args.script, '-M', args.outdir, args.proto])
     #os.remove(config_file)
 
 if __name__ == '__main__':
