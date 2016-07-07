@@ -12,7 +12,7 @@ def make_led(fn,s):
 def hled(outfile,dictfile,wordsfile,s):
     ledfile = 'hled_temp.led'
     make_led(ledfile,s)
-    subprocess.call(['HLEd', '-l', "'*'", '-d', dictfile, '-i', outfile, ledfile, wordsfile])
+    subprocess.call(['HLEd', '-l', '*', '-d', dictfile, '-i', outfile, ledfile, wordsfile])
     os.remove(ledfile)
 
 

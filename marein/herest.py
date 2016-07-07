@@ -7,7 +7,8 @@ def herest(mlf,script,macrodir,hmms,outdir,pruning,n):
     t = ['{:.1f}'.format(p) for p in pruning]
     cur_dir = macrodir
     macros = ['macros','hmmdefs']
-    os.mkdir(outdir)
+    if not os.path.exists(outdir):
+        os.mkdir(outdir)
     for i in range(n):
         H = [item for pair in zip(['-H']*len(macros),[os.path.join(cur_dir,macro) for macro in macros]) for item in pair]
         cur_dir = os.path.join(outdir,outdir+str(i))

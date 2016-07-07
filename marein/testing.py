@@ -3,9 +3,9 @@ import subprocess
 import os 
 
 def hresults(args):
-    mlf = os.path.join(args.indir_files, 'testset.mlf')
+    mlf = os.path.join(args.indir_files, 'phones.mlf')
     mono = os.path.join(args.indir_files, 'monophones')
-    subprocess.call(['HResults -I', mlf, mono, 'results.mlf'])
+    subprocess.call(['HResults', '-I', mlf, mono, 'results.mlf'])
 
 def hvite(args):
     macros = os.path.join(args.indir_hmm, 'macros')
@@ -14,8 +14,7 @@ def hvite(args):
     dic = os.path.join(args.indir_files, 'dict')
     mono = os.path.join(args.indir_files, 'monophones')
     scp = os.path.join(args.indir_files, 'hcompv_temp.scp')
-    subprocess.call(['HVite -A -D -T 1 -H', macros, '-H', hmmdefs, '-S', scp, '-i results.mlf', '-w', wdnet, '-p 0.0 -s 5.0', dic, mono])
-
+    subprocess.call(['HVite', '-H', macros, '-H', hmm, '-S', scp, '-i', 'results.mlf', '-w', wdnet, '-p', '0.0', '-s', '5.0', dic, mono])
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Testing the recognition performance.')

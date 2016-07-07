@@ -4,10 +4,13 @@ DICT=data/current_wordlist.txt
 python gram.py gram --folder $INFILES --regex "cut_\d*_\d*_(\w*).wav"
 HParse gram wdnet
 cat $WORDS | LC_ALL=C sort | uniq > wlist
-cat $DICT | LC_ALL=C sort | uniq | sed -e 's/\t/\t1\t/' > ordered_dict
+cat $DICT | LC_ALL=C sort | uniq > ordered_dict
 python replace_numbers.py ordered_dict
+sed -e 's/\t/\t1\t/' -i ordered_dict
 HDMan -m -w wlist -n monophones -i dict ordered_dict
 echo 'sil' >> monophones
+echo -e 'silence\t[silence]\tsil' >> dict
+sort dict -o dict
 python mlf.py mlf --folder $INFILES --regex "cut_\d*_\d*_(\w*).wav"
 python hcopy.py $INFILES mfc
 python proto.py proto
