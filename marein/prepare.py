@@ -48,7 +48,7 @@ def most_common_type(dir):
     counter = Counter(types)
     return counter.most_common(1)[0][0][1:].upper()
 
- def add_sourceformat_to_config(indir,config_in,config_out):
+def add_sourceformat_to_config(indir,config_in,config_out):
     copyfile(config_in,config_out)
     filetype = most_common_type(indir)
     with open(config_out,'r+') as f:
@@ -92,3 +92,4 @@ if __name__ == '__main__':
     parser.add_argument('dict', help='The word->phoneme dictionary file path')
     args = parser.parse_args()
     prepare(args.indir,args.outdir,args.regex,args.config,args.dict)
+
