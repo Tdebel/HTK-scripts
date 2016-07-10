@@ -13,7 +13,6 @@ def hresults(words_mlf,monophones,results_mlf,tempdir):
     pipe = popen('HResults -e silence . -I {} {} {}'.format(words_lab_mlf,monophones,results_nosilence_mlf))
     out, _ = pipe.communicate()
     regex = r'WORD.*Acc=(-?[\d\.]*)'
-    print(out) # TODO remove, only for debugging
     return float(re.search(regex,str(out)).group(1))
 
 def hvite(indir,wdnet,dic,monophones,scp,results_mlf):

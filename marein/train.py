@@ -48,6 +48,7 @@ def herest(config,mlf,script,macrodir,hmms,outdir,pruning=[250,150,1000],n=6):
         if not os.path.exists(cur_dir):
             os.mkdir(cur_dir)
         subprocess.call(['HERest', '-C', config, '-I', mlf, '-t'] + t + ['-S', script] + H + ['-M', cur_dir, hmms])
+    return cur_dir
 
 def train(outdir,config,scp,proto,dict,words_mlf,monophones,tempdir,floor=0.01):
     if not os.path.exists(outdir):
@@ -61,7 +62,7 @@ def train(outdir,config,scp,proto,dict,words_mlf,monophones,tempdir,floor=0.01):
     hled(phones_mlf,dict,words_mlf)
     macro(outdir,outdir)
     hmmdefs(outdir,monophones,outdir)
-    final_dir, herest(config,phones_mlf,scp,outdir,monophones,outdir)
+    final_dir = herest(config,phones_mlf,scp,outdir,monophones,outdir)
 
     return phones_mlf, final_dir
 	
