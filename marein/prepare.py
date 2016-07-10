@@ -57,39 +57,57 @@ def add_sourceformat_to_config(indir,config_in,config_out):
         f.write('SOURCEFORMAT = {}\n'.format(filetype) + content)
     
 # hcopy the files from indir to outdir given a config file
-def hcopy(indir,outdir,config):
-    scp = 'scp'
-    make_scp(indir,outdir,scp)
-    if not os.path.exists(outdir):
-        os.mkdir(outdir)
-    config_prepare = config+'_prepare'
-    add_sourceformat_to_config(indir,config,config_prepare)
-    subprocess.call(['HCopy','-C',config_prepare,'-S',scp])
-		
-def prepare(indir,outdir,regex,config,dict):
-	gram_folder('gram',indir,regex)
-	call('HParse gram wdnet')
-	call("cut -d' ' -f1 {} > words".format(dict))
-	call('cat words | LC_ALL=C sort | uniq > wlist')
-	call('cat {} | LC_ALL=C sort | uniq > ordered_dict'.format(dict))
-	replace_numbers('ordered_dict')
-	call("sed -e 's/\t/\t1\t/' -i ordered_dict")
-	call('HDMan -m -w wlist -n monophones -i dict ordered_dict')
-	call("echo 'sil' >> monophones")
-	call("echo -e 'silence\t[silence]\tsil' >> dict")
-	call("sort dict -o dict")
-	mlf_folder('words.mlf',indir,regex)
-	hcopy(indir,outdir,config)
-    
-# python prepare.py ../../material/segmentations mfc "cut_\d*_\d*_(\w*).wav" input/config input/current_wordlist.txt
+def hcopy(sourcedir,mfcdir,filedir,config,tempdir):
+    scp = os.path.join(tempdir,'scp')
+    make_scp(sourcedir,mfcdir,scp)
+    if not os.path.exists(mfcdir):
+        os.mkdir(mfcdir)
+    config_prepare = os.path.join(tempdir, 'prepare.config')
+    add_sourceformat_to_config(sourcedir,config,config_prepare)
+    call('HCopy -C {} -S {}'.format(config_prepare,scp))
+    return scp
 
+def prepare(sourcedir,mfcdir,filedir,regex,config,dictionary,tempdir):
+    
+    if not os.path.exists(tempdir):
+        os.mkdir(tempdir)
+    if not os.path.exists(filedir):
+        os.mkdir(filedir)
+
+    gram = os.path.join(tempdir,'gram')
+    wdnet = os.path.join(filedir,'wdnet')
+    wlist = os.path.join(tempdir,'wlist')
+    temp_dict = os.path.join(tempdir,'dict')
+    htk_dict = os.path.join(filedir,'dict')
+    monophones = os.path.join(filedir,'monophones')
+    words_mlf = os.path.join(filedir,'words.mlf')
+    scp = os.path.join(filedir,'scp')
+
+    gram_folder(gram,sourcedir,regex)
+    call('HParse {} {}'.format(gram,wdnet))
+    call("cut -d'\t' -f1 {} | LC_ALL=C sort | uniq > {}".format(dictionary,wlist))
+    call('cat {} | LC_ALL=C sort | uniq > {}'.format(dictionary,temp_dict))
+    replace_numbers(temp_dict)
+    call("sed -e 's/\t/\t1\t/' -i {}".format(temp_dict))
+    call('HDMan -m -w {} -n {} -i {} {}'.format(wlist,monophones,htk_dict,temp_dict))
+    call("echo 'sil' >> {}".format(monophones))
+    call("echo -e 'silence\t[silence]\tsil' >> {}".format(htk_dict))
+    call("sort {0} -o {0}".format(htk_dict))
+    mlf_folder(words_mlf,sourcedir,regex)
+    temp_scp = hcopy(sourcedir,mfcdir,filedir,config,tempdir)
+    call('cat {} | cut -d " " -f 2 > {}'.format(temp_scp,scp))
+
+    return wdnet, htk_dict, monophones, words_mlf, scp
+    
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('indir', help='The directory of the input sound files.')
-    parser.add_argument('outdir', help='The directory to create the prepared files in.')
+    parser.add_argument('sourcedir', help='The directory of the input sound files.')
     parser.add_argument('regex', help='The regex for extracting words from the sound file names.')
     parser.add_argument('config', help='The config file path.')
-    parser.add_argument('dict', help='The word->phoneme dictionary file path')
+    parser.add_argument('dictionary', help='The word->phoneme dictionary file path')
+    parser.add_argument('--tempdir', help='The directory to use for temporary files used in this script', nargs='?', default='.temp')
+    parser.add_argument('--mfcdir', help='The directory to create the prepared mfc files in.',nargs='?',default='mfc')
+    parser.add_argument('--filedir', help='The directory to store other output files in.',nargs='?',default='htk')
     args = parser.parse_args()
-    prepare(args.indir,args.outdir,args.regex,args.config,args.dict)
-
+    outfiles = prepare(args.sourcedir,args.mfcdir,args.filedir,args.regex,args.config,args.dictionary,args.tempdir)
+    print(' '.join(outfiles))

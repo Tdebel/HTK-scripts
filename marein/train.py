@@ -49,28 +49,33 @@ def herest(config,mlf,script,macrodir,hmms,outdir,pruning=[250,150,1000],n=6):
             os.mkdir(cur_dir)
         subprocess.call(['HERest', '-C', config, '-I', mlf, '-t'] + t + ['-S', script] + H + ['-M', cur_dir, hmms])
 
-def train(config,scp,outdir,proto,dict,mlf,monophones,floor=0.01):
+def train(outdir,config,scp,proto,dict,words_mlf,monophones,tempdir,floor=0.01):
     if not os.path.exists(outdir):
         os.mkdir(outdir)
-    call('cat {} | cut -d " " -f 2 > scp2'.format(scp))
-    call('HCompV -C {} -f {} -m -S scp2 -M {} {}'.format(config,floor,outdir,proto))
-    hled('phones.mlf',dict,mlf)
-    if not os.path.exists(outdir+'2'):
-        os.mkdir(outdir+'2')
-    macro(outdir,outdir+'2') #???
-    hmmdefs(outdir,monophones,outdir+'2')
-    herest(config,'phones.mlf','scp2',outdir+'2',monophones,outdir)
-	
-# python train.py htk scp ordered_dict input/proto words.mlf monophones input/config
+    if not os.path.exists(tempdir):
+        os.mkdir(tempdirdir)
 
+    phones_mlf = os.path.join(outdir,'phones.mlf')
+
+    call('HCompV -C {} -f {} -m -S {} -M {} {}'.format(config,floor,scp,outdir,proto))
+    hled(phones_mlf,dict,words_mlf)
+    macro(outdir,outdir)
+    hmmdefs(outdir,monophones,outdir)
+    final_dir, herest(config,phones_mlf,scp,outdir,monophones,outdir)
+
+    return phones_mlf, final_dir
+	
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
-    parser.add_argument('outdir', help='The working directory for this script (will contain hmmdef# folders).')
     parser.add_argument('scp', help='The script file (mfc file list).')
     parser.add_argument('dict', help='The word->phoneme dictionary file path')
-    parser.add_argument('proto', help='The input proto file')
-    parser.add_argument('mlf', help='The input mlf file.')
+    parser.add_argument('mlf', help='The input (words) mlf file.')
     parser.add_argument('monophones', help='The input monophones file.')
+    parser.add_argument('proto', help='The input proto file')
     parser.add_argument('config', help='The config file path.')
+    parser.add_argument('--filedir', help='The working directory for this script (will contain hmm folders).',nargs='?',default='htk')
+    parser.add_argument('--tempdir', help='Temporary file storage for this script..',nargs='?',default='.temp')
     args = parser.parse_args()
-    train(args.config, args.scp, args.outdir, args.proto, args.dict, args.mlf, args.monophones)
+    output = train(args.filedir, args.config, args.scp, args.proto, args.dict, args.mlf, args.monophones, args.tempdir)
+    print(' '.join(output))
+
