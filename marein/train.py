@@ -56,7 +56,7 @@ def train(outdir,config,scp,proto,dict,words_mlf,monophones,tempdir,floor=0.01):
     if not os.path.exists(tempdir):
         os.mkdir(tempdirdir)
 
-    phones_mlf = os.path.join(outdir,'phones.mlf')
+    phones_mlf = os.path.join(tempdir,'phones.mlf')
 
     call('HCompV -C {} -f {} -m -S {} -M {} {}'.format(config,floor,scp,outdir,proto))
     hled(phones_mlf,dict,words_mlf)
@@ -64,7 +64,7 @@ def train(outdir,config,scp,proto,dict,words_mlf,monophones,tempdir,floor=0.01):
     hmmdefs(outdir,monophones,outdir)
     final_dir = herest(config,phones_mlf,scp,outdir,monophones,outdir)
 
-    return phones_mlf, final_dir
+    return final_dir
 	
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='')
