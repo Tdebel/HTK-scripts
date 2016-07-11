@@ -20,6 +20,14 @@ def hvite(indir,wdnet,dic,monophones,scp,results_mlf):
     hmm = os.path.join(indir, 'hmmdefs')
     call('HVite -H {} -H {} -S {} -i {} -w {} -p 0.0 -s 5.0 {} {}'.format(macros,hmm,scp,results_mlf,wdnet,dic,monophones))
 
+
+def test(htkdir,indir,wdnet,dict,monophones,scp,mlf,tempdir,s='vr'):
+    results_mlf = os.path.join(htkdir,'results.mlf')
+    if 'v' in s:
+        hvite(indir,wdnet,dict,monophones,scp,results_mlf)
+    if 'r' in s:
+        return hresults(mlf,monophones,results_mlf,tempdir)
+
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description='Testing the recognition performance.')
     parser.add_argument('indir', help='The directory of the hmmdefs and macros files')
@@ -32,13 +40,7 @@ if __name__ == '__main__':
     parser.add_argument('--htkdir', help='Output files location.',nargs='?',default='htk')
     parser.add_argument('--tempdir', help='Temporary storage.',nargs='?',default='.temp')
     args = parser.parse_args()
-    results_mlf = os.path.join(args.htkdir,'results.mlf')
-    if 'v' in args.s:
-        hvite(args.indir,args.wdnet,args.dict,args.monophones,args.scp,results_mlf)
-    if 'r' in args.s:
-        r = hresults(args.mlf,args.monophones,results_mlf,args.tempdir)
-        print(r)
-
-    
+    r = test(args.htkir, args.indir, args.wdnet, args.dict, args.monophones, args.scp, args.mlf, args.tempdir,args.s)
+    print(r)
 
     
